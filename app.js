@@ -247,9 +247,11 @@ function parseExt(s) {
   }
   return null;
 }
-/* 公開版（GitHub Pages）のアドレス。公開版には server.py がないので /api/ は使えない */
+/* 公開版（GitHub Pages）のアドレス。公開版には server.py がないので、
+   曲名の読み取りは Vercel に置いた同じ処理（cloud/api/tracks.py）を呼ぶ */
 const PUBLIC_URL = 'https://aoi0909zzz.github.io/music/';
 const HOSTED = location.protocol === 'https:';
+const TRACKS_API = (HOSTED ? 'https://music-playlist-reader.vercel.app' : '') + '/api/tracks?url=';
 /* 名前とカバー画像は各サービスの oEmbed から。取れなければ URL から作った名前のまま */
 async function extMeta(x) {
   const ep = x.src === 'spotify' ? 'https://open.spotify.com/oembed?url=' : 'https://music.apple.com/api/oembed?url=';
@@ -348,16 +350,15 @@ async function convertExt(extPlId) {
   if (!src || !src.ext) return;
   const exist = state.playlists.find(p => p.convFrom === src.ext.page);
   if (exist) { location.hash = '#/playlist/' + exist.id; if (convLeft(exist)) runConv(exist.id); else toast('YouTube 版は作成済みです'); return; }
-  if (HOSTED) return toast('曲の読み取りは、パソコンで start.bat から起動した music でだけ行えます。パソコンで YouTube 版を作り、設定の「書き出す」「読み込む」でこちらへ移してください', 9000);
   if (!state.settings.apiKey) return needKey();
   toast('曲の一覧を読み取っています…', 0);
   let data;
   try {
-    const r = await fetch('/api/tracks?url=' + encodeURIComponent(src.ext.page));
+    const r = await fetch(TRACKS_API + encodeURIComponent(src.ext.page));
     data = await r.json();
     if (!r.ok || !Array.isArray(data.tracks)) throw new Error(data.error || '');
   } catch (e) {
-    return toast(/[ぁ-ん]/.test(e.message) ? e.message : '曲の一覧を読み取れませんでした。start.bat から起動しているか確認してください', 6000);
+    return toast(/[ぁ-ん]/.test(e.message) ? e.message : (HOSTED ? '曲の一覧を読み取れませんでした。通信状態を確認して、もう一度試してください' : '曲の一覧を読み取れませんでした。start.bat から起動しているか確認してください'), 6000);
   }
   const tracks = data.tracks.slice(0, 500).map(t => ({ title: String(t.title).slice(0, 200), artist: String(t.artist || '').slice(0, 200) }));
   const p = { id: uid(), name: src.name, ids: [], at: now(), convFrom: src.ext.page, conv: { src: src.ext.src, total: Math.max(+data.total || 0, tracks.length), tracks } };
@@ -852,8 +853,7 @@ const views = {
           <input type="file" id="import-file" accept="application/json,.json" hidden></div>
         <div class="panel"><h2>外出先で使う</h2>
           <p>次のアドレスは、パソコンを起動していなくても、どこからでも開けます。スマホではブラウザのメニューから「ホーム画面に追加」しておくと便利です。</p>
-          <p><b style="font-size:18px;color:var(--text);user-select:all">${esc(PUBLIC_URL)}</b></p>
-          <p>外部アプリのプレイリストから YouTube 版を作る機能だけは、パソコンで起動した music で使ってください。</p></div>
+          <p><b style="font-size:18px;color:var(--text);user-select:all">${esc(PUBLIC_URL)}</b></p></div>
         <div class="panel"><h2>${HOSTED ? 'データを移す' : '家の Wi-Fi でスマホから開く'}</h2><div id="phone-info">${HOSTED ? '' : '<p>確認しています…</p>'}</div>
           <p>ライブラリやプレイリストは端末ごとに別々に保存されます。開くアドレスが違う場合も別々です。内容を移すには、上の「書き出す」で作ったファイルを移す先の端末に送り、そちらで「読み込む」を使ってください。API キーは端末ごとに入れ直します。</p></div>
         <div class="panel"><h2>このアプリについて</h2><p>再生には YouTube の公式埋め込みプレーヤーを使っています。動画の保存や音声の抜き出しは行いません。YouTube の規約により映像は常に表示され、広告が入ることがあります。投稿者が埋め込みを許可していない動画は再生できません。</p></div>`;
