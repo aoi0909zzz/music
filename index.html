@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>music</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="app">
+  <aside id="sidebar">
+    <a class="brand" href="#/home"><span class="logo" aria-hidden="true"><i></i><i></i><i></i></span>music</a>
+    <nav class="nav" aria-label="メイン">
+      <a href="#/home" data-nav="home"><span data-icon="home"></span>ホーム</a>
+      <a href="#/search" data-nav="search"><span data-icon="search"></span>検索</a>
+      <a href="#/library/songs" data-nav="library"><span data-icon="library"></span>ライブラリ</a>
+    </nav>
+    <div class="side-head">
+      <span>プレイリスト</span>
+      <button class="ib" data-action="pl-add-menu" aria-label="プレイリストを追加" title="プレイリストを追加"><span data-icon="plus"></span></button>
+    </div>
+    <ul id="side-playlists"></ul>
+    <a class="side-foot" href="#/settings" data-nav="settings"><span data-icon="settings"></span>設定</a>
+  </aside>
+
+  <main id="main"><div id="view"></div></main>
+
+  <aside id="now" aria-label="再生中">
+    <div id="ext-wrap" hidden></div>
+    <div id="video-wrap">
+      <div id="player-host"></div>
+      <div id="video-empty">曲を選ぶと、ここに映像が表示されます</div>
+    </div>
+    <div id="now-body">
+      <div id="now-info"></div>
+      <div class="queue-head"><span>次に再生</span><button class="link" data-action="queue-clear">クリア</button></div>
+      <ol id="queue"></ol>
+    </div>
+  </aside>
+
+  <footer id="bar">
+    <div class="bar-left">
+      <img id="bar-thumb" alt="" hidden>
+      <div class="bar-meta"><b id="bar-title">再生していません</b><a id="bar-artist" data-action="artist"></a></div>
+      <button class="ib" id="bar-like" data-action="like-current" aria-label="お気に入り" hidden><span data-icon="heart"></span></button>
+    </div>
+    <div class="bar-center">
+      <div class="ctrls">
+        <button class="ib" id="btn-shuffle" data-action="shuffle" aria-label="シャッフル" title="シャッフル"><span data-icon="shuffle"></span></button>
+        <button class="ib" data-action="prev" aria-label="前の曲"><span data-icon="prev"></span></button>
+        <button class="play" id="btn-play" data-action="toggle" aria-label="再生"><span data-icon="play"></span></button>
+        <button class="ib" data-action="next" aria-label="次の曲"><span data-icon="next"></span></button>
+        <button class="ib" id="btn-repeat" data-action="repeat" aria-label="リピート" title="リピート"><span data-icon="repeat"></span><em></em></button>
+      </div>
+      <div class="seek">
+        <span id="t-cur">0:00</span>
+        <input type="range" id="seek" min="0" max="1000" value="0" aria-label="再生位置">
+        <span id="t-dur">0:00</span>
+      </div>
+    </div>
+    <div class="bar-right">
+      <button class="ib" id="btn-now" data-action="toggle-now" aria-label="映像とキュー" title="映像とキュー"><span data-icon="queue"></span></button>
+      <span class="vol"><span data-icon="volume"></span><input type="range" id="vol" min="0" max="100" aria-label="音量"></span>
+    </div>
+  </footer>
+
+  <nav id="tabs" aria-label="メイン">
+    <a href="#/home" data-nav="home"><span data-icon="home"></span>ホーム</a>
+    <a href="#/search" data-nav="search"><span data-icon="search"></span>検索</a>
+    <a href="#/library/songs" data-nav="library"><span data-icon="library"></span>ライブラリ</a>
+    <a href="#/settings" data-nav="settings"><span data-icon="settings"></span>設定</a>
+  </nav>
+</div>
+
+<div id="probe" aria-hidden="true"></div>
+<div id="menu" role="menu" hidden></div>
+<div id="modal" hidden></div>
+<div id="toast" role="status" hidden></div>
+<script src="app.js"></script>
+</body>
+</html>
